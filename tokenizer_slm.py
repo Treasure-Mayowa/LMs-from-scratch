@@ -5,6 +5,8 @@ from datasets import load_dataset
 class SimpleTokenizer:
 
     UNKNOWN_TOKEN = "<UNK>"
+    PAD_TOKEN = "<PAD>"
+
 
     def __init__(self, corpus: List[str], vocabulary: List[str] | None = None):
         """Initializes the tokenizer with texts in the dataset or with a vocabulary."""
@@ -16,7 +18,7 @@ class SimpleTokenizer:
             # Convert text sequence to tokens.
             tokens = []
             for text in corpus:
-                for token in self.space_tokenize(text):
+                for token in self.space_tokenizer(text):
                     tokens.append(token)
 
             # Create a vocabulary comprising of unique tokens.
@@ -25,7 +27,7 @@ class SimpleTokenizer:
         else:
             self.vocabulary = vocabulary
 
-        self.vocabulary = vocabulary + self.UNKNOWN_TOKEN
+        self.vocabulary = [self.PAD_TOKEN] + self.vocabulary + [self.UNKNOWN_TOKEN]
         self.vocabulary_size = len(self.vocabulary)
 
         # Create token and token IDs mappings.
@@ -36,7 +38,7 @@ class SimpleTokenizer:
             self.token_to_index[token] = index
             self.index_to_token[index] = token
 
-    def space_tokenizer(text: str) -> List[str]:
+    def space_tokenizer(self, text: str) -> List[str]:
         """Splits a string into a list of tokens and removes punctuation."""
 
         # Replace exclamation marks with a space before splitting
@@ -55,7 +57,7 @@ class SimpleTokenizer:
         # Convert tokens into indices.
         indices = []
         unk_index = self.token_to_index[self.UNKNOWN_TOKEN]
-        for token in self.space_tokenize(text):
+        for token in self.space_tokenizer(text):
             token_index = self.token_to_index.get(token, unk_index)
             indices.append(token_index)
 
